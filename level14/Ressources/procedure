@@ -1,0 +1,52 @@
+ssh level14@192.168.1.34 -p 4242
+2A31L79asukciNyi8uppkEuSx
+ls -la
+
+#Nothing here, let's try to find a file with flag14 as user
+
+find / -user flag14 2>&1 | grep -v "Permission denied"
+
+#Nothing usefull here
+#after searching everywhere for flag14 binary, maybe I can gdb directly the getflag to use the uuid of flag14?
+#let's get a look first with ltrace
+
+ltrace /bin/getflag
+
+#ltrace seems to be stuck with ptrace() call
+
+gdb /bin/getflag -q
+disass main
+
+
+#after some research about ptrace(), it's seems to act only when we use a tracer (ltrace, gdb etc) and I found a way to bypass or remove it:
+
+catch syscall ptrace
+commands 1
+set ($eax) = 0
+continue
+end
+run
+
+# it work ! we bypassed the ptrace() and get the program executed correctly for level14.
+# let's try to get it executed for flag14 now
+
+cat /etc/passwd | grep flag14 ---> uuid 3014
+
+
+#with the use of a break point to the getuid() and some nexti we can get directly to the place we need to edit the register:
+
+b getuid
+run
+
+#do nexti until we reach main again or next
+
+next
+
+#we reach now <main+444>, we just have to edit the register
+
+set $(eax) = 3014
+
+c
+
+
+---> 7QiHafiNa3HVozsaXkawuYrTstxbpABHD8CPnHJ
